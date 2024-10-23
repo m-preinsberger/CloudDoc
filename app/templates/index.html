@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Drop Your Files Here</h1>
+        <div id="drop-area" class="large-drop-area">
+            <form class="my-form">
+                <p>Upload multiple files with the file dialog or by dragging and dropping files onto the dashed region</p>
+                <input type="file" id="fileElem" multiple accept="*" onchange="handleFiles(this.files)">
+                <label class="button" for="fileElem">Select some files</label>
+            </form>
+        </div>
+        <ul id="file-list"></ul>
+        <progress id="progress-bar" max="100" value="0"></progress>
+        <button id="commit-btn">Commit</button>
+        <div id="download-link"></div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
