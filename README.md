@@ -19,4 +19,4 @@ This project is a web application that allows users to upload files via drag-and
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone <[repository-url](https://github.com/m-preinsberger/CloudDoc.git)>
