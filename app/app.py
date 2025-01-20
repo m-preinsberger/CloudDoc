@@ -28,24 +28,18 @@ def create_app(test_config=None):
 
     @app.route('/')
     def index():
-        return render_template('index.html')
+        # List files in the uploads directory
+        files = os.listdir(app.config['UPLOAD_FOLDER'])
+        return render_template('index.html', files=files)
 
-    @app.route('/upload', methods=['POST'])
-    def upload_file():
-        if 'file' not in request.files:
-            return jsonify({'error': 'No file part'}), 400
-        file = request.files['file']
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
-        if file:
-            filename = file.filename
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            uploaded_files.append(filename)
-            return jsonify({'success': 'File uploaded successfully'}), 200
-
-    @app.route('/files', methods=['GET'])
-    def get_files():
-        return jsonify({'files': uploaded_files})
+    @app.route('/delete', methods=['POST'])
+    def delete_file():
+        file_name = request.json.get('file_name')
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            return jsonify({'success': f'File {file_name} deleted successfully'}), 200
+        return jsonify({'error': 'File not found'}), 404
 
     @app.route('/commit', methods=['POST'])
     def commit_files():
@@ -55,8 +49,28 @@ def create_app(test_config=None):
 
     @app.route('/download/<filename>', methods=['GET'])
     def download_file(filename):
-        file_path = os.path.join(app.instance_path, filename)
-        return send_file(file_path, as_attachment=True)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(file_path):
+            return send_file(file_path, as_attachment=True)
+        return jsonify({'error': 'File not found'}), 404
+
+
+    @app.route('/upload', methods=['POST'])
+    def upload_file():
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+        files = request.files.getlist('file')
+        for file in files:
+            if file.filename == '':
+                continue
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+        return jsonify({'success': 'Files uploaded successfully'}), 200
+
+    @app.route('/files', methods=['GET'])
+    def get_files():
+        files = os.listdir(app.config['UPLOAD_FOLDER'])
+        return jsonify({'files': files})
+
 
     return app
 
